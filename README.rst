@@ -91,7 +91,8 @@ Or the following command to update an existing version:
 Usage Example
 =============
 
-.. code-block:: python
+.. code-block:: python3
+
     import time
     import board
     import adafruit_mcp3421
