@@ -47,6 +47,10 @@ class MCP3421:
         16: 0b10,  # Resolution set to 16-bit (15 SPS)
         18: 0b11,  # Resolution set to 18-bit (3.75 SPS)
     }
+    _gain = 1
+    _resolution = 14
+    _unused = 0b00  # Unused bits, defaulting to 0
+    _ready = 0b0  # Ready bit, defaulting to 0
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -60,15 +64,18 @@ class MCP3421:
         :param bool continuous_mode: Select continuous sampling or one shot sampling
         """
         self.i2c_device = I2CDevice(i2c, address)
-        if gain is None:
-            gain = self.MCP3421_GAIN[1]
-        self._gain = gain
-        if resolution is None:
-            resolution = self.MCP3421_RESOLUTION[12]
-        self._resolution = resolution
+        if gain is not None:
+            self._gain = gain
+
+        if resolution is not None:
+            self._resolution = resolution
+
         self._mode = continuous_mode
-        self._unused = 0b00  # Unused bits, defaulting to 0
-        self._ready = 0b0  # Ready bit, defaulting to 0
+
+        self.gain = self._gain
+        self.resolution = self._resolution
+        self.mode = self._mode
+
         self.adc_data = bytearray(4)
 
     def _read_data(self):
@@ -76,8 +83,8 @@ class MCP3421:
         with self.i2c_device as device:
             try:
                 device.readinto(buffer)
-            except OSError:
-                return False  # I2C read failed
+            except Exception as error:
+                raise OSError(f"{error}") from error
 
             # Extract ADC data
             self.adc_data = buffer[:3]
@@ -87,8 +94,6 @@ class MCP3421:
                 self._update_config(buffer[3])
             else:  # For 12, 14, or 16-bit resolutions, the config byte is the third byte
                 self._update_config(buffer[2])
-
-            return True
 
     def _update_config(self, config_byte):
         self._gain = (config_byte >> 6) & 0b11
