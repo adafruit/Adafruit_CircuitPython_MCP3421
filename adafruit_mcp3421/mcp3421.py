@@ -89,77 +89,80 @@ class MCP3421:
             # Extract ADC data
             self.adc_data = buffer[:3]
 
-            # Update the configuration from the fourth byte for 18-bit resolution
-            if (buffer[3] & 0b11) == self.MCP3421_RESOLUTION[18]:
-                self._update_config(buffer[3])
-            else:  # For 12, 14, or 16-bit resolutions, the config byte is the third byte
+            # Initially, update the configuration from the fourth byte
+            self._update_config(buffer[3])
+
+            # For 12, 14, or 16-bit resolutions, update the config byte using the third byte
+            if (self._resolution & 0b11) != self.MCP3421_RESOLUTION[18]:
                 self._update_config(buffer[2])
 
     def _update_config(self, config_byte):
-        self._gain = (config_byte >> 6) & 0b11
-        self._resolution = (config_byte >> 4) & 0b11
-        self._mode = (config_byte >> 3) & 0b1
-        self._unused = (config_byte >> 1) & 0b11
-        self._ready = config_byte & 0b1
+        self._gain = config_byte & 0b11  # Gain is in bits 1-0
+        self._resolution = (config_byte >> 2) & 0b11  # Resolution is in bits 3-2
+        self._mode = (config_byte >> 4) & 0b1  # Mode is in bit 4
+        self._ready = (config_byte >> 7) & 0b1  # Ready bit is in bit 7
 
     @property
-    def register_value(self) -> int:
+    def _register_value(self) -> int:
         """
         Combine all fields into a single byte
 
         :rtype: int
         """
-        return (
-            (self._gain << 6)
-            | (self._resolution << 4)
-            | (self._mode << 3)
-            | (self._unused << 1)
-            | self._ready
-        )
+        # Ensure that each field is within its valid range
+        gain_bits = self._gain & 0b11  # Gain is in bits 1-0
+        resolution_bits = self._resolution & 0b11  # Resolution is in bits 3-2
+        mode_bit = 0b1 if self._mode else 0b0  # Mode is in bit 4
+
+        # Combine the fields into a single configuration byte
+        config_byte = (gain_bits) | (resolution_bits << 2) | (mode_bit << 4)
+        return config_byte
 
     @property
     def gain(self) -> int:
         """
-        The current gain setting from the device
+        The current gain setting from the device, translated to user-friendly value
 
         :rtype: int
         """
-        try:
-            self._read_data()  # Update data and check if read was successful
-            return self._gain
-        except Exception as error:
-            raise OSError(f"Failed to read gain from device: {error}") from error
+        self._read_data()  # Update data and check if read was successful
+        # Translate the bit pattern back to the user-friendly gain value
+        for gain_value, bit_pattern in self.MCP3421_GAIN.items():
+            if self._gain == bit_pattern:
+                return gain_value
+        # Raise an exception if no match is found
+        raise ValueError(f"Invalid gain bit pattern: {self._gain}")
 
     @gain.setter
     def gain(self, value: int) -> None:
         if value not in self.MCP3421_GAIN:
             raise ValueError("Invalid gain value")
-        gain_value = self.MCP3421_GAIN[value]
-        self._gain = gain_value
-        config_byte = self.register_value
+        self._gain = self.MCP3421_GAIN[value]  # Translate to bit pattern
+        config_byte = self._register_value
         with self.i2c_device as device:
             device.write(bytes([config_byte]))
 
     @property
     def resolution(self) -> int:
         """
-        The current resolution setting from the device
+        The current resolution setting from the device, translated to user-friendly value
 
         :rtype: int
         """
-        try:
-            self._read_data()  # Update data and check if read was successful
-            return self._resolution
-        except Exception as error:
-            raise OSError(f"Failed to read resolution from device: {error}") from error
+        self._read_data()  # Update data and check if read was successful
+        # Translate the bit pattern back to the user-friendly resolution value
+        for resolution_value, bit_pattern in self.MCP3421_RESOLUTION.items():
+            if self._resolution == bit_pattern:
+                return resolution_value
+        # Raise an exception if no match is found
+        raise ValueError(f"Invalid gain bit pattern: {self._resolution}")
 
     @resolution.setter
     def resolution(self, value: int) -> None:
         if value not in self.MCP3421_RESOLUTION:
             raise ValueError("Invalid resolution value")
-        resolution_value = self.MCP3421_RESOLUTION[value]
-        self._resolution = resolution_value
-        config_byte = self.register_value
+        self._resolution = self.MCP3421_RESOLUTION[value]  # Translate to bit pattern
+        config_byte = self._register_value
         with self.i2c_device as device:
             device.write(bytes([config_byte]))
 
@@ -179,7 +182,7 @@ class MCP3421:
     @mode.setter
     def mode(self, value: bool) -> None:
         self._mode = value
-        config_byte = self.register_value
+        config_byte = self._register_value
         with self.i2c_device as device:
             device.write(bytes([config_byte]))
 
