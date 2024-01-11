@@ -13,5 +13,5 @@ adc = ADC.MCP3421(i2c)
 adc_channel = AnalogIn(adc)
 
 while True:
-    print((adc_channel.value,))
+    print(adc_channel.value)
     time.sleep(0.01)

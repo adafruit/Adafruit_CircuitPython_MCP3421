@@ -54,7 +54,6 @@ class MCP3421:
     }
     _gain = 1
     _resolution = 14
-    _unused = 0b00  # Unused bits, defaulting to 0
     _ready = 0b0  # Ready bit, defaulting to 0
 
     # pylint: disable=too-many-arguments
