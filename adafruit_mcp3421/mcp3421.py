@@ -1,6 +1,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2024 Liz Clark for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
+# Written by Liz Clark (Adafruit Industries)
+# with OpenAI ChatGPT v4 November 21, 2023 build
+# https://help.openai.com/en/articles/6825453-chatgpt-release-notes
+
+# https://chat.openai.com/share/1fe7ea12-4f7c-493a-98d2-68210638292b
 """
 `adafruit_mcp3421`
 ================================================================================
