@@ -7,7 +7,7 @@
 
 # https://chat.openai.com/share/1fe7ea12-4f7c-493a-98d2-68210638292b
 """
-`adafruit_mcp3421`
+:py:class:`~adafruit_mcp3421.mcp3421.MCP3421`
 ================================================================================
 
 CircuitPython driver for the MCP3421 analog to digital converter
