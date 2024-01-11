@@ -64,7 +64,7 @@ class MCP3421:
 
         :param int address: I2C address (default 0x68)
         :param int gain: Select 1X, 2X, 4X or 8X gain (defaults to 1X)
-        :param int resolution: Select 12, 14, 16 or 18 bit resolution (defaults to 12-bit)
+        :param int resolution: Select 12, 14, 16 or 18 bit resolution (defaults to 14-bit)
         :param bool continuous_mode: Select continuous sampling or one shot sampling
         """
         self.i2c_device = I2CDevice(i2c, address)

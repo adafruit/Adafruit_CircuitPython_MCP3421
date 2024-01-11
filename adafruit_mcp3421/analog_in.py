@@ -27,6 +27,6 @@ class AnalogIn:
 
     @property
     def value(self) -> int:
-        """Returns the value of an ADC pin as an integer in the range [0, 65535]."""
+        """Returns the value of an ADC pin as an integer"""
         result = self._adc.read()
         return result
