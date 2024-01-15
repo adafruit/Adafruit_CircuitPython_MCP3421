@@ -78,7 +78,7 @@ class MCP3421:
 
         self.gain = self._gain
         self.resolution = self._resolution
-        self.mode = self._mode
+        self.continuous_mode = self._mode
 
         self.adc_data = bytearray(4)
 
@@ -171,7 +171,7 @@ class MCP3421:
             device.write(bytes([config_byte]))
 
     @property
-    def mode(self) -> bool:
+    def continuous_mode(self) -> bool:
         """
         Current mode setting from the device
 
@@ -183,8 +183,8 @@ class MCP3421:
         except Exception as error:
             raise OSError(f"Failed to read mode from device: {error}") from error
 
-    @mode.setter
-    def mode(self, value: bool) -> None:
+    @continuous_mode.setter
+    def continuous_mode(self, value: bool) -> None:
         self._mode = value
         config_byte = self._register_value
         with self.i2c_device as device:

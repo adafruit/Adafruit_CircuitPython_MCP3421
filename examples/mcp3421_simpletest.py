@@ -28,5 +28,11 @@ adc_channel = AnalogIn(adc)
 while True:
     print(f"ADC value: {adc_channel.value}")
     print(f"Current gain: {adc.gain}X")
+    print(f"Current resolution: {adc.resolution}-bit")
+    if adc.continuous_mode:
+        mode = "continuous"
+    else:
+        mode = "one-shot"
+    print(f"Mode: {mode}")
     print()
     time.sleep(0.01)
