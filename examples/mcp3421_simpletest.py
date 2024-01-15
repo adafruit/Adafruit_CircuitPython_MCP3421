@@ -26,5 +26,7 @@ adc_channel = AnalogIn(adc)
 # adc.continuous_mode = True
 
 while True:
-    print(adc_channel.value)
+    print(f"ADC value: {adc_channel.value}")
+    print(f"Current gain: {adc.gain}X")
+    print()
     time.sleep(0.01)
