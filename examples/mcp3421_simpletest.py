@@ -9,7 +9,7 @@ from adafruit_mcp3421.analog_in import AnalogIn
 
 i2c = board.I2C()
 
-adc = ADC.MCP3421(i2c, gain = 1, resolution = 14, continuous_mode = True)
+adc = ADC.MCP3421(i2c, gain=1, resolution=14, continuous_mode=True)
 adc_channel = AnalogIn(adc)
 # gain, resolution and mode can also be set after instantiation:
 
