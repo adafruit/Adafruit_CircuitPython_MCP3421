@@ -56,10 +56,7 @@ class MCP3421:
     _resolution = 14
     _ready = 0b0  # Ready bit, defaulting to 0
 
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self, i2c, address=0x68, gain=None, resolution=None, continuous_mode=True
-    ) -> None:
+    def __init__(self, i2c, address=0x68, gain=None, resolution=None, continuous_mode=True) -> None:
         """Initialization over I2C
 
         :param int address: I2C address (default 0x68)
@@ -202,22 +199,18 @@ class MCP3421:
             raise OSError(f"Failed to read from device: {error}") from error
 
         adc_value = 0
-        if self._resolution in [
+        if self._resolution in {
             self.MCP3421_RESOLUTION[12],
             self.MCP3421_RESOLUTION[14],
             self.MCP3421_RESOLUTION[16],
-        ]:
+        }:
             # Directly cast the first two bytes to int16_t
             adc_value = (self.adc_data[0] << 8) | self.adc_data[1]
-            if (
-                self.adc_data[0] & 0x80
-            ):  # Check if the top bit is set for sign extension
+            if self.adc_data[0] & 0x80:  # Check if the top bit is set for sign extension
                 adc_value -= 0x10000
         elif self._resolution == self.MCP3421_RESOLUTION[18]:
             # Use all three bytes, considering the differential nature
-            adc_value = (
-                (self.adc_data[0] << 16) | (self.adc_data[1] << 8) | self.adc_data[2]
-            )
+            adc_value = (self.adc_data[0] << 16) | (self.adc_data[1] << 8) | self.adc_data[2]
             if self.adc_data[0] & 0x80:  # Extend the sign if the top bit is set
                 adc_value = adc_value - 0x1000000  # Sign-extend to 32 bits
         return adc_value
