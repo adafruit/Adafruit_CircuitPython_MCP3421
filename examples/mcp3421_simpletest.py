@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
 import board
+
 import adafruit_mcp3421.mcp3421 as ADC
 from adafruit_mcp3421.analog_in import AnalogIn
 
