@@ -212,5 +212,5 @@ class MCP3421:
             # Use all three bytes, considering the differential nature
             adc_value = (self.adc_data[0] << 16) | (self.adc_data[1] << 8) | self.adc_data[2]
             if self.adc_data[0] & 0x80:  # Extend the sign if the top bit is set
-                adc_value = adc_value - 0x1000000  # Sign-extend to 32 bits
+                adc_value -= 0x1000000  # Sign-extend to 32 bits
         return adc_value
